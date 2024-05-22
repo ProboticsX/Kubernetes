@@ -11,6 +11,6 @@ spec:
     app: frontend-nginxapp
   ports: 
     - name: http
-      port: 80
-      targetPort: 80
-      nodePort: 31234
+      port: 8080
+      targetPort: 8080
+      # nodePort: 31231
