@@ -1,0 +1,4 @@
+- create iam policy, sa to allow external dns to add records to route53
+- deploy external dns
+- add record annotation in ingress which will create a record inside route53 hosted zone
+- can do the same process for a k8s service too
