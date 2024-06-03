@@ -2,10 +2,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress-ssl-demo
+  name: ingress-certdiscoveryhost-demo
   annotations:
     # Load Balancer Name
-    alb.ingress.kubernetes.io/load-balancer-name: ssl-ingress
+    alb.ingress.kubernetes.io/load-balancer-name: certdiscoveryhost-ingress
     # Ingress Core Settings
     #kubernetes.io/ingress.class: "alb" (OLD INGRESS CLASS NOTATION - STILL WORKS BUT RECOMMENDED TO USE IngressClass Resource)
     alb.ingress.kubernetes.io/scheme: internet-facing
@@ -20,11 +20,13 @@ metadata:
     alb.ingress.kubernetes.io/unhealthy-threshold-count: '2'   
     ## SSL Settings
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
-    # arn of the certificate created
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:427509263767:certificate/2bfbcd94-da24-4770-868d-2b2de04c1aef
-    #alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS-1-1-2017-01 #Optional (Picks default if not used)
+    # COMMENTING OUT CERTIFICATE ARN
+    #alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:180789647333:certificate/632a3ff6-3f6d-464c-9121-b9d97481a76b
+    #alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS-1-1-2017-01 #Optional (Picks default if not used)    
     # SSL Redirect Setting
-    alb.ingress.kubernetes.io/ssl-redirect: '443'   
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    # External DNS - For creating a Record Set in Route53
+    external-dns.alpha.kubernetes.io/hostname: shubhams101.pecs-operations-dev.nl.lexis.com 
 spec:
   ingressClassName: my-aws-ingress-class   # Ingress Class                  
   defaultBackend:
@@ -33,16 +35,20 @@ spec:
       port:
         number: 80     
   rules:
-    - http:
-        paths:      
-          - path: /app1
+    - host: shubhams102.pecs-operations-dev.nl.lexis.com 
+      http:
+        paths:
+          - path: /
             pathType: Prefix
             backend:
               service:
                 name: app1-nginx-nodeport-service
                 port: 
                   number: 80
-          - path: /app2
+    - host: shubhams103.pecs-operations-dev.nl.lexis.com 
+      http:
+        paths:                  
+          - path: /
             pathType: Prefix
             backend:
               service:
@@ -53,6 +59,4 @@ spec:
 # Important Note-1: In path based routing order is very important, if we are going to use  "/*", try to use it at the end of all rules.                                        
                         
 # 1. If  "spec.ingressClassName: my-aws-ingress-class" not specified, will reference default ingress class on this kubernetes cluster
-# 2. Default Ingress class is nothing but for which ingress class we have the annotation `ingressclass.kubernetes.io/is-default-class: "true"`
-      
-    
+# 2. Default Ingress class is nothing but for which ingress class we have the annotation `ingressclass.kubernetes.io/is-default-class: "true"`    

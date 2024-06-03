@@ -6,7 +6,7 @@ metadata:
     app: app1-nginx
   annotations:
     #automatically adds annotation for a LB service similar to what it does for ingress LB
-    external-dns.alpha.kubernetes.io/hostname: externaldns-k8s-service-demo101.stacksimplify.com
+    external-dns.alpha.kubernetes.io/hostname: shubhams101.pecs-operations-dev.nl.lexis.com
     service.beta.kubernetes.io/aws-load-balancer-type: external
     service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
 spec:

@@ -1,0 +1,2 @@
+- By SSL discovery, the ingress automatically discovers the certificate and assigns it to itself without explicitly mentioning the certificate arn in the annotation (For virtual host based routing)
+- By TLS discovery, the ingress automatically discovers the certificate and assigns itself (for normal ingress)

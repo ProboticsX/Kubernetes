@@ -1,0 +1,1 @@
+- Having different subdomains according to apps

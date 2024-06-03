@@ -1,0 +1,1 @@
+- Ingress groups enable multiple ingress resources to be grouped together and they are created with the same Address value

@@ -1,14 +1,15 @@
 # Annotations Reference: https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/ingress/annotations/
+#apiVersion: extensions/v1beta1
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress-ssl-demo
+  name: app1-ingress
   annotations:
     # Load Balancer Name
-    alb.ingress.kubernetes.io/load-balancer-name: ssl-ingress
-    # Ingress Core Settings
+    alb.ingress.kubernetes.io/load-balancer-name: ingress-groups-demo
+    # Ingress Core Settings  
     #kubernetes.io/ingress.class: "alb" (OLD INGRESS CLASS NOTATION - STILL WORKS BUT RECOMMENDED TO USE IngressClass Resource)
-    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/scheme: internet-facing    
     # Health Check Settings
     alb.ingress.kubernetes.io/healthcheck-protocol: HTTP 
     alb.ingress.kubernetes.io/healthcheck-port: traffic-port
@@ -17,24 +18,24 @@ metadata:
     alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '5'
     alb.ingress.kubernetes.io/success-codes: '200'
     alb.ingress.kubernetes.io/healthy-threshold-count: '2'
-    alb.ingress.kubernetes.io/unhealthy-threshold-count: '2'   
+    alb.ingress.kubernetes.io/unhealthy-threshold-count: '2'
     ## SSL Settings
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
-    # arn of the certificate created
     alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:427509263767:certificate/2bfbcd94-da24-4770-868d-2b2de04c1aef
-    #alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS-1-1-2017-01 #Optional (Picks default if not used)
+    #alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS-1-1-2017-01 #Optional (Picks default if not used)    
     # SSL Redirect Setting
-    alb.ingress.kubernetes.io/ssl-redirect: '443'   
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    # External DNS - For creating a Record Set in Route53
+    # keeping the same ingress name
+    external-dns.alpha.kubernetes.io/hostname: shubhams101.pecs-operations-dev.nl.lexis.com 
+    # Ingress Groups
+    alb.ingress.kubernetes.io/group.name: myapps.web
+    alb.ingress.kubernetes.io/group.order: '10'
 spec:
-  ingressClassName: my-aws-ingress-class   # Ingress Class                  
-  defaultBackend:
-    service:
-      name: app3-nginx-nodeport-service
-      port:
-        number: 80     
-  rules:
+  ingressClassName: my-aws-ingress-class   # Ingress Class
+  rules:  
     - http:
-        paths:      
+        paths:
           - path: /app1
             pathType: Prefix
             backend:
@@ -42,17 +43,4 @@ spec:
                 name: app1-nginx-nodeport-service
                 port: 
                   number: 80
-          - path: /app2
-            pathType: Prefix
-            backend:
-              service:
-                name: app2-nginx-nodeport-service
-                port: 
-                  number: 80
 
-# Important Note-1: In path based routing order is very important, if we are going to use  "/*", try to use it at the end of all rules.                                        
-                        
-# 1. If  "spec.ingressClassName: my-aws-ingress-class" not specified, will reference default ingress class on this kubernetes cluster
-# 2. Default Ingress class is nothing but for which ingress class we have the annotation `ingressclass.kubernetes.io/is-default-class: "true"`
-      
-    
